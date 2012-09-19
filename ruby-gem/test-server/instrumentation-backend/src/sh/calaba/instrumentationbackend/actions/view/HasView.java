@@ -10,11 +10,14 @@ public class HasView implements Action {
     @Override
     public Result execute(String... args) {
         final String idArgument = args[0];
-        final View foundView = TestHelpers.getViewById(idArgument);
+		View foundView = TestHelpers.getViewById(idArgument);
         
         if( null == foundView ) {
-            return notFoundResult(idArgument);
-        }
+			foundView = TestHelpers.getViewByDescription(idArgument);
+			if(null == foundView) {
+				return notFoundResult(idArgument);
+			}
+		}
         
         return Result.successResult();
     }

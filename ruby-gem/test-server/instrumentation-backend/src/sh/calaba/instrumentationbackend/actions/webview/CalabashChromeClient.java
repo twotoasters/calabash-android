@@ -23,14 +23,22 @@ public class CalabashChromeClient extends WebChromeClient {
 	private WebChromeClient mWebChromeClient;
 	private final WebView webView;
 
-	public CalabashChromeClient(WebView webView) {
+	public CalabashChromeClient(final WebView webView) {
 		this.webView = webView;
 		try {
 	        Method methodGetConfiguration = webView.getClass().getMethod("getWebChromeClient");
 	        mWebChromeClient = (WebChromeClient)methodGetConfiguration.invoke(webView);
-	        webView.setWebChromeClient(this);
 		} catch(Exception e) {
-			throw new RuntimeException(e);
+			// no throw
+		} finally {
+			webView.post(new Runnable() {
+
+				@Override
+				public void run() {
+					webView.setWebChromeClient(CalabashChromeClient.this);
+				}
+
+			});
 		}
 	}
 	
@@ -97,9 +105,14 @@ public class CalabashChromeClient extends WebChromeClient {
 		ArrayList<View> views = InstrumentationBackend.solo.getCurrentViews();
 		for (View view : views) {
 			if ( view instanceof WebView) {
-				WebView webView = (WebView)view;
+				final WebView webView = (WebView)view;
 				webViews.add(new CalabashChromeClient(webView));
-				webView.getSettings().setJavaScriptEnabled(true);
+				InstrumentationBackend.solo.getCurrentActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						webView.getSettings().setJavaScriptEnabled(true);
+					}
+				});
 				System.out.println("Setting CalabashChromeClient");
 			}
 		}
