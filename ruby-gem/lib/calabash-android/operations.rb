@@ -135,7 +135,7 @@ module Operations
       @app_path = app_path
       @test_server_path = test_server_path
 
-      puts "#{adb_command} forward tcp:b#{server_port} tcp:7102"
+      puts "#{adb_command} forward tcp:#{server_port} tcp:7102"
       log `#{adb_command} forward tcp:#{server_port} tcp:7102`
     end
 
